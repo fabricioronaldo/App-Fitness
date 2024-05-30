@@ -1,8 +1,10 @@
 package com.fabriciovelasco.fitness
 
+import android.content.Context
 import android.content.DialogInterface
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
@@ -22,20 +24,21 @@ class ImcActivity : AppCompatActivity() {
         editheight = findViewById(R.id.edit_imc_height)
 
         val btnSend: Button = findViewById(R.id.btn_imc_send)
+
         btnSend.setOnClickListener {
-            if(!validate()){
+            if (!validate()) {
                 Toast.makeText(this, R.string.fields_message, Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
-            } else {
-                val weight = editWeight.text.toString().toInt()
-                val height = editheight.text.toString().toInt()
+            }
+            val weight = editWeight.text.toString().toInt()
+            val height = editheight.text.toString().toInt()
 
-                val result = calculateImc(weight,height)
+            val result = calculateImc(weight, height)
 
-                val imcResponseId = imcResponse(result)
+            val imcResponseId = imcResponse(result)
 
 
-                AlertDialog.Builder(this)
+            AlertDialog.Builder(this)
                 .setTitle(getString(R.string.imc_response, result))
                 .setMessage(imcResponseId)
                 .setPositiveButton(android.R.string.ok) { dialog, which ->
@@ -43,6 +46,8 @@ class ImcActivity : AppCompatActivity() {
                 }
                 .create()
                 .show()
+            val services = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            services.hideSoftInputFromWindow(currentFocus?.windowToken, 0)
 
 //                código mais verboso
 //                val dialog = AlertDialog.Builder(this)
@@ -63,12 +68,12 @@ class ImcActivity : AppCompatActivity() {
 //                val d = dialog.create()
 //                d.show()
 
-            }
+
         }
     }
 
     @StringRes
-    private fun imcResponse(imc: Double): Int{
+    private fun imcResponse(imc: Double): Int {
 
         return when {
             imc < 15.0 -> R.string.imc_severely_low_weight
@@ -81,9 +86,11 @@ class ImcActivity : AppCompatActivity() {
             else -> R.string.imc_extreme_weight
         }
     }
+
     private fun calculateImc(weight: Int, height: Int): Double {
-        return weight / ((height /100.0) * (height / 100.0))
+        return weight / ((height / 100.0) * (height / 100.0))
     }
+
     private fun validate(): Boolean {
         //usuário não pode inserir valor nulo
         // usuário não pode inserir valor <= 0
